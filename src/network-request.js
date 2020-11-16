@@ -33,7 +33,7 @@ async function request(method, endpoint, apiKey, data = {}){
 					if(Array.isArray(value))
 						value = value.join(',');
 
-					return `${key}=${value}`;
+					return `&${key}=${value}`;
 				});
 			
 			if(params.length)
