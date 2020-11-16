@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Innovation Map Library Demo</title>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
+
+    <style>
+        body.fetching-innovators button:disabled,
+        button:disabled{
+            pointer-events: none;
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="mt-8 mx-auto max-w-5xl">
+        <div class="flex items-center border-b border-gray-700 pb-3">
+            <h3 class="text-xl font-normal">SDG support by innovators in Tanzania</h3>
+        </div>
+
+        <div class="mt-5">
+            <div id="innovatorList" class="grid grid-cols-3 gap-3">
+                    
+            </div>
+        </div>
+    </div>
+
+    <script src="../dist/innovators-map-tz.umd.js"></script>
+    <script>
+        let innovatorsMap;
+
+        window.addEventListener('load', function(){
+            innovatorsMap = new InnovatorsMapTz();
+            fetchInnovators();
+        });
+
+        async function fetchInnovators(){
+            const innovators = await innovatorsMap.getInnovators();
+            console.log("Innovators: ", innovators);
+        }
+    </script>
+</body>
+</html>

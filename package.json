@@ -1,0 +1,28 @@
+{
+  "name": "innovators-map-tz",
+  "author": {
+    "name": "iPF Softwares",
+    "email": "info@ipfsoftwares.com"
+  },
+  "type": "module",
+  "version": "1.0.0",
+  "main": "dist/innovators-map-tz.cjs.js",
+  "module": "dist/innovators-map-tz.esm.js",
+  "browser": "dist/innovators-map-tz.umd.js",
+  "devDependencies": {
+    "@babel/preset-env": "^7.12.1",
+    "@rollup/plugin-commonjs": "^11.0.1",
+    "@rollup/plugin-node-resolve": "^7.0.0",
+    "rollup": "^1.29.0"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "node test/test.js --target es6",
+    "pretest": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {}
+}
