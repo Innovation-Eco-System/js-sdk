@@ -12,17 +12,47 @@
             pointer-events: none;
             opacity: 0.4;
         }
+
+        body.fetching-innovators #innovatorList,
+        body:not(.fetching-innovators) #innovatorLoader{
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
     <div class="mt-8 mx-auto max-w-5xl">
         <div class="flex items-center border-b border-gray-700 pb-3">
             <h3 class="text-xl font-normal">SDG support by innovators in Tanzania</h3>
+
+            <div class="ml-auto flex items-center">
+                <button disabled id="prevPageButton" class="text-xs bg-transparent py-1 leading-none px-3 text-gray-500 hover:text-gray-100 border border-gray-600 hover-border-gray-400 hover:bg-gray-800 rounded-full flex items-center"
+                    onclick="gotToPrevPage()"
+                >
+                    <svg class="w-4 -ml-2 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    Prev
+                </button>
+                
+                <span class="mx-5 text-xs opacity-75">
+                    Page <span id="pageNumber">1</span> of <span id="totalPages">20</span>
+                </span>
+
+                <button disabled id="nextPageButton" class="text-xs bg-transparent py-1 leading-none px-3 text-gray-500 hover:text-gray-100 border border-gray-600 hover-border-gray-400 hover:bg-gray-800 rounded-full flex items-center"
+                    onclick="gotToNextPage()"
+                >
+                    Next 
+                    <svg class="w-4 -mr-2 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
         </div>
 
         <div class="mt-5">
+            <div id="innovatorLoader" class="flex flex-col items-center justify-center">
+                <svg stroke="red" stroke-width="3" width="40" height="40" viewBox="0 0 100 100" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid" style="background: none"><circle cx="50" cy="50" fill="none" r="35" stroke-dasharray="164.93361431346415 56.97787143782138" transform="rotate(269.874 50 50)"><animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 50;360 50 50" keyTimes="0;1" dur="1s" begin="0s" repeatCount="indefinite"></animateTransform></circle></svg>
+                <p class="mt-2 text-sm tracking-wider opacity-75">Fetching innovators...</p>
+            </div>
+
             <div id="innovatorList" class="grid grid-cols-3 gap-3">
-                    
+                
             </div>
         </div>
     </div>
@@ -32,13 +62,105 @@
         let innovatorsMap;
 
         window.addEventListener('load', function(){
-            innovatorsMap = new InnovatorsMapTz();
+            innovatorsMap = new InnovatorsMapTz({
+                apiKey: "[YOUR API KEY]"
+            });
+
             fetchInnovators();
         });
 
-        async function fetchInnovators(){
-            const innovators = await innovatorsMap.getInnovators();
-            console.log("Innovators: ", innovators);
+        const innovatorList = document.querySelector("#innovatorList");
+
+        async function fetchInnovators(page = 1){
+            document.body.classList.add("fetching-innovators");
+            const { data, ...pagination } = await innovatorsMap.getInnovators({
+                page
+            });
+
+            console.log("Innovators: ", data[0].location.coordinates);
+            document.body.classList.remove("fetching-innovators");
+
+            updatePaginationUI(pagination);
+
+            innovatorList.innerHTML = "";
+
+            data.forEach(stakeholder => {
+                const { name, logo, locationName, location, sdg } = stakeholder;
+                const mapImage = `https://www.mapquestapi.com/staticmap/v4/getplacemap?key=HkQT4BGfQ9clGrwhLknjPxeF08UZ3k9K&location=${location.coordinates.reverse().join(',')}&size=600,300&type=map&zoom=16&imagetype=jpg&scalebar=false&`;
+                
+                const stakeholderItem = `
+                    <div class="bg-gray-800 mt-4 flex flex-col rounded-md overflow-hidden border-2 border-gray-700">
+                        <div class="mb-4 bg-white pt-16 bg-cover bg-center" style="background-image: url(${mapImage});">
+                            <div class="ml-4 mt-4 -mb-8 w-16 h-16 rounded-full border-8 border-gray-800 overflow-hidden mr-4 flex-shrink-0 relative">
+                                <img class="absolute w-full h-full inset-0 object-cover" src="${logo}" alt="Logo" />
+                            </div>
+                        </div>
+                
+                        <div class="p-4">
+                            <h3 class="text-sm font-semibold">
+                                ${name}
+                            </h3>
+                            <p class="mt-1 capitalize text-sm leading-snug opacity-75">
+                                ${locationName}
+                            </p>
+
+                            <p class="text-gray-300 text-xs mt-4">SDGs supported</p>
+                            <div class="mt-2 flex">
+                                ${getSDGHtml(sdg)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                innovatorList.innerHTML += stakeholderItem;
+            });
+        }
+
+        function getSDGHtml(sdgs){
+            const sdgColors = ["#e4243b", "#d3a029", "#279b48", "#c31f33", "#ef402b", "#00aed9", "#fcc30c", "#8f1838", "#f36d25", "#e11484", "#f99d26", "#cf8d2a", "#48773e", "#007dbc", "#3eb049", "#02558b", "#183668"];
+
+            return sdgs.map(sdg => {
+                const color = sdgColors[parseInt(sdg) - 1];
+
+                return `
+                    <div style="background-color: ${color};" class="w-8 h-8 rounded-full -mr-2 relative text-white border-2 border-gray-800 flex items-center justify-center">
+                        ${sdg}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        
+        const prevPageButton = document.querySelector("#prevPageButton");
+        const nextPageButton = document.querySelector("#nextPageButton");
+        const pageNumber = document.querySelector("#pageNumber");
+        const totalPages = document.querySelector("#totalPages");
+
+        function updatePaginationUI(pagination){
+            const { page, hasNextPage, hasPrevPage, pageCount, total } = pagination;
+
+            pageNumber.textContent = page;
+            totalPages.textContent = pageCount;
+
+            if(!hasPrevPage)
+                prevPageButton.setAttribute('disabled', 'disabled');
+            else
+                prevPageButton.removeAttribute('disabled');
+
+            if(!hasNextPage)
+                nextPageButton.setAttribute('disabled', 'disabled');
+            else
+                nextPageButton.removeAttribute('disabled');
+        }
+
+        function gotToPrevPage(){
+            const currentPage = parseInt(pageNumber.textContent);
+            fetchInnovators(currentPage - 1);
+        }
+
+        function gotToNextPage(){
+            const currentPage = parseInt(pageNumber.textContent);
+            fetchInnovators(currentPage + 1);
         }
     </script>
 </body>
