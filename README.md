@@ -14,7 +14,9 @@ Javascript SDK for the [Innovation Map Tanzania](https://innovationmap.co.tz) AP
         let innovatorsMap;
 
         window.addEventListener('load', function(){
-            innovatorsMap = new InnovatorsMapTz();
+            innovatorsMap = new InnovatorsMapTz({
+                apiKey: "[YOUR API KEY]"
+            });
             fetchInnovators();
         });
 
