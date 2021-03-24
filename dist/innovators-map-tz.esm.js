@@ -3,7 +3,7 @@ async function getRequest(endpoint, apiKey, data){
 }
 
 async function request(method, endpoint, apiKey, data = {}){
-	let url = `https://innovationmap.co.tz/api${endpoint}?clientId=${apiKey}`;
+	let url = `https://innovate.co.tz/api${endpoint}?clientId=${apiKey}`;
 
 	const requestConfig =  {
 		method,
