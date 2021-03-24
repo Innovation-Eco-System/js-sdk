@@ -62,7 +62,7 @@ class InnovatorsMapTz {
 
 	getInnovators(filters){
 		if(!this.apiKey)
-			throw new Error('API Key required, go to https://innovationmap.co.tz/app/studio/developer to get your key.');
+			throw new Error('API Key required, go to https://innovate.co.tz/app/studio/developer to get your key.');
 			
 		return getRequest("/stakeholders", this.apiKey, filters);
 	}
