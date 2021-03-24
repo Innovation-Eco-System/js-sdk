@@ -1,8 +1,8 @@
 # Innovate MAP Javascript SDK
-Javascript SDK for the [Innovation Map Tanzania](https://innovationmap.co.tz) API.
+Javascript SDK for the [Innovation Map Tanzania](https://innovate.co.tz) API.
 
 ## Using the SDK
-- Grap your api key from [here 🔗](https://innovationmap.co.tz/app/studio/developer/myApps)
+- Grap your api key from [here 🔗](https://innovate.co.tz/app/studio/developer/myApps)
 
 - Download the SDK from [here 👉](/dist/innovators-map-tz.umd.js)
 
